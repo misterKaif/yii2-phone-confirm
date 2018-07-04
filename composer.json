@@ -1,5 +1,5 @@
 {
-  "name": "Teimur/yii2-phone-confirm",
+  "name": "teimur/yii2-phone-confirm",
   "description": "",
   "require": {
     "yiisoft/yii2": "~2.0",
