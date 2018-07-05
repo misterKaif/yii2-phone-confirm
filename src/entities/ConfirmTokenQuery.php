@@ -1,14 +1,11 @@
 <?php
 
-namespace teimur8\yiiPhoneConfirm\entities;
-
-use common\entities\user\User;
-
+namespace Teimur\YiiPhoneConfirm\entities;
 
 /**
- * This is the ActiveQuery class for [[\common\models\ConfirmToken]].
+ * This is the ActiveQuery class for [[ConfirmToken]].
  *
- * @see \common\entities\ConfirmToken
+ * @see ConfirmToken
  */
 class ConfirmTokenQuery extends \yii\db\ActiveQuery
 {
@@ -19,7 +16,7 @@ class ConfirmTokenQuery extends \yii\db\ActiveQuery
 
     /**
      * @inheritdoc
-     * @return \common\entities\ConfirmToken[]|array
+     * @return ConfirmToken[]|array
      */
     public function all($db = null)
     {
@@ -28,7 +25,7 @@ class ConfirmTokenQuery extends \yii\db\ActiveQuery
 
     /**
      * @inheritdoc
-     * @return \common\entities\ConfirmToken|array|null
+     * @return ConfirmToken|array|null
      */
     public function one($db = null)
     {
@@ -48,14 +45,15 @@ class ConfirmTokenQuery extends \yii\db\ActiveQuery
     {
         return $this->andWhere(compact('type'));
     }
-
-    /**
-     * @param User $user
-     * @return $this
-     */
-    public function byUser(User $user)
+    
+    public function expiried()
     {
-        return $this->byUserId($user->id);
+        return $this->andWhere(['<', 'expires_at', time()]);
+    }
+    
+    public function notExpiried()
+    {
+        return $this->andWhere(['>', 'expires_at', time()]);
     }
 
     /**
@@ -75,6 +73,8 @@ class ConfirmTokenQuery extends \yii\db\ActiveQuery
     {
         return $this->andWhere(compact('token'));
     }
+    
+    
 
     /**
      * @param string $time

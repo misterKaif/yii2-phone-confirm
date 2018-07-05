@@ -18,10 +18,11 @@ class m180629_081524_create_confirm_token_tbl extends Migration
             'action' => $this->smallInteger()->notNull(),
             'token' => $this->integer()->notNull(),
             'user_id' => $this->integer()->notNull(),
+            'try_count' => $this->integer(2)->defaultValue(0),
             'attempt_no' => $this->integer()->unsigned()->defaultValue(1),
-            'expires_at' => $this->timestamp(),
-            'created_at' => $this->timestamp()->notNull(),
-            'updated_at' => $this->timestamp()->notNull(),
+            'expires_at' => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
         ]);
     }
 

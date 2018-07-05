@@ -1,9 +1,10 @@
 <?php
 
-namespace teimur8\yiiPhoneConfirm\entities;
+namespace Teimur\YiiPhoneConfirm\entities;
 
-use common\entities\queries\ConfirmTokenQuery;
+use Teimur\YiiPhoneConfirm\Config;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
 /**
@@ -15,10 +16,10 @@ use yii\db\ActiveRecord;
  * @property integer $action
  * @property integer $token
  * @property integer $user_id
+ * @property integer $try_count
  * @property string $created_at
+ * @property string $expires_at
  * @property string $updated_at
- *
- * @property User $user
  */
 class ConfirmToken extends ActiveRecord
 {
@@ -29,6 +30,13 @@ class ConfirmToken extends ActiveRecord
     {
         return '{{%confirm_token}}';
     }
+    
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
+        ];
+    }
 
     /**
      * @inheritdoc
@@ -37,9 +45,9 @@ class ConfirmToken extends ActiveRecord
     {
         return [
             [['type', 'action', 'token', 'user_id'], 'required'],
-            [['attempt_no', 'type', 'action', 'token', 'user_id'], 'integer'],
+            [['attempt_no', 'type', 'action', 'token', 'user_id','expires_at','try_count' ], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Config::getUserClass(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -49,12 +57,14 @@ class ConfirmToken extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
+            'id'         => Yii::t('app', 'ID'),
             'attempt_no' => Yii::t('app', 'Attempt No'),
-            'type' => Yii::t('app', 'Type'),
-            'action' => Yii::t('app', 'Action'),
-            'token' => Yii::t('app', 'Token'),
-            'user_id' => Yii::t('app', 'User ID'),
+            'type'       => Yii::t('app', 'Type'),
+            'action'     => Yii::t('app', 'Action'),
+            'token'      => Yii::t('app', 'Token'),
+            'user_id'    => Yii::t('app', 'User ID'),
+            'expires_at' => Yii::t('app', 'Expires At'),
+            'try_count'  => Yii::t('app', 'Try Count'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
@@ -65,7 +75,7 @@ class ConfirmToken extends ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(Config::getUserClass(), ['id' => 'user_id']);
     }
 
     /**
@@ -74,6 +84,13 @@ class ConfirmToken extends ActiveRecord
      */
     public static function find()
     {
-        return new \common\entities\queries\ConfirmTokenQuery(get_called_class());
+        return new ConfirmTokenQuery(get_called_class());
     }
+    
+    public function wait($seconds)
+    {
+        return ($this->updated_at + $seconds) > time();
+    }
+    
+
 }

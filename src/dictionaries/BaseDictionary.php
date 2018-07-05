@@ -1,5 +1,5 @@
 <?php
-namespace teimur8\yiiPhoneConfirm\dictionaries;
+namespace Teimur\YiiPhoneConfirm\dictionaries;
 
 use Webmozart\Assert\Assert;
 use Yii;

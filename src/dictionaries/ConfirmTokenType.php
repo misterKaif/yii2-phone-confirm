@@ -1,7 +1,6 @@
 <?php
 
-namespace teimur8\yiiPhoneConfirm\dictionaries;
-
+namespace Teimur\YiiPhoneConfirm\dictionaries;
 
 use Yii;
 

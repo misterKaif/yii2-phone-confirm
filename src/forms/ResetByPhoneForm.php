@@ -1,8 +1,9 @@
 <?php
 
-namespace teimur8\yiiPhoneConfirm\forms;
+namespace Teimur\YiiPhoneConfirm\forms;
 
 use borales\extensions\phoneInput\PhoneInputValidator;
+use Teimur\YiiPhoneConfirm\Config;
 use Yii;
 use yii\base\Model;
 
@@ -19,11 +20,10 @@ class ResetByPhoneForm extends Model
     public function rules()
     {
         return [
-            
             ['phone', 'trim'],
             ['phone', 'required'],
             [['phone'], PhoneInputValidator::class],
-            [['phone'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['phone' => 'phone']],
+            [['phone'], 'exist', 'targetClass' => Config::getUserClass(), 'targetAttribute' => ['phone' => 'phone']],
         ];
     }
 }
