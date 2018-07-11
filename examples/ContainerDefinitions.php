@@ -14,8 +14,8 @@ class ContainerDefinitions implements BootstrapInterface
         $container->setSingleton(Manager::class, function(){
             $handlers[] = new SmscNotifyHandler(Yii::$app->params['smsc']['login'], Yii::$app->params['smsc']['password']);
             $handlers[] = new YiiMailerNotifyHandler();
-            
-            $manager = new Manager($handlers, Yii::$app->monolog->logger);
+    
+            $manager = new Manager($handlers, Yii::$app->monolog);
             
             return $manager;
         }

@@ -3,6 +3,8 @@
 namespace Teimur\YiiPhoneConfirm\entities;
 
 use Teimur\YiiPhoneConfirm\Config;
+use Teimur\YiiPhoneConfirm\dictionaries\ConfirmTokenAction;
+use Teimur\YiiPhoneConfirm\dictionaries\ConfirmTokenType;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -92,5 +94,13 @@ class ConfirmToken extends ActiveRecord
         return ($this->updated_at + $seconds) > time();
     }
     
-
+    public static function findSmsUniversalByUser($user_id)
+    {
+        return self::find()
+            ->byAction(ConfirmTokenAction::UNIVERSAL)
+            ->byType(ConfirmTokenType::SMS)
+            ->byUserId($user_id)
+            ->limit(1)
+            ->one();
+    }
 }

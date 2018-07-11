@@ -23,7 +23,7 @@ class ResetByPhoneForm extends Model
             ['phone', 'trim'],
             ['phone', 'required'],
             [['phone'], PhoneInputValidator::class],
-            [['phone'], 'exist', 'targetClass' => Config::getUserClass(), 'targetAttribute' => ['phone' => 'phone']],
+            [['phone'], 'exist', 'targetClass' => Config::getUserClass(), 'targetAttribute' => 'phone'],
         ];
     }
 }

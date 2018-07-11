@@ -22,6 +22,7 @@ class YiiMailerNotifyHandler implements HandlerInterface
      */
     function handle(NotificationInterface $notification)
     {
-        Yii::$app->mailer->send($notification->getMessage());
+        Yii::info(Yii::t('app', 'Email send: message:  {message}', ['message' => $notification->getMessage()]));
+//        Yii::$app->mailer->send($notification->getMessage());
     }
 }

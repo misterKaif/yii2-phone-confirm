@@ -8,11 +8,11 @@ use Yii;
 
 class SmsService extends NotificationService
 {
-    public function sendRegisterConfirm($phone, ConfirmToken $token)
+    public function sendSms($phone, ConfirmToken $token)
     {
         $this->send(new SmsNotification(
             $phone,
-            Yii::t('app', "Registration code: {token}", ['token' => $token->token])
+            Yii::t('app', "Code: {token}", ['token' => $token->token])
         ));
     }
     

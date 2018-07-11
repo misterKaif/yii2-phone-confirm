@@ -8,6 +8,7 @@ abstract class ConfirmTokenAction extends BaseDictionary
 {
     const CONFIRM_REGISTRATION = 1;
     const RESET_PASSWORD = 2;
+    const UNIVERSAL = 3;
 
     public static function all(): array
     {

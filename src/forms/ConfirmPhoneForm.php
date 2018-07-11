@@ -15,6 +15,8 @@ class ConfirmPhoneForm extends Model
 {
     public $phone;
     public $token;
+    public $type;
+    private $_token;
     
     /**
      * {@inheritdoc}
@@ -25,7 +27,7 @@ class ConfirmPhoneForm extends Model
             ['phone', 'trim'],
             [['phone', 'token'], 'required'],
             [['phone'], PhoneInputValidator::class],
-            [['phone'], 'exist', 'targetClass' => Config::getUserClass(), 'targetAttribute' => ['phone' => 'phone']],
+            [['phone'], 'exist', 'targetClass' => Config::getUserClass(), 'targetAttribute' => 'phone'],
         ];
     }
     
@@ -37,12 +39,22 @@ class ConfirmPhoneForm extends Model
         $service = Yii::createObject(ConfirmTokenService::class);
     
         try {
-            $service->validateSmsToken($this->phone, $this->token);
+            $this->_token = $service->validateSmsToken($this->phone, $this->token);
         } catch (\Exception $e) {
             $this->addError('token', $e->getMessage());
             return false;
         }
+
+    }
     
+    public function getToken()
+    {
+        return $this->_token;
+    }
+    
+    public function tokenActionIs($action)
+    {
+        return $this->_token->action == $action;
     }
     
 }

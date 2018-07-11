@@ -3,6 +3,7 @@
 namespace Teimur\YiiPhoneConfirm;
 
 use api\exceptions\Http400Exception;
+use Teimur\YiiPhoneConfirm\dictionaries\ConfirmTokenAction;
 use Teimur\YiiPhoneConfirm\dictionaries\ConfirmTokenType;
 use Teimur\YiiPhoneConfirm\entities\ConfirmToken;
 use Webmozart\Assert\Assert;
@@ -125,28 +126,51 @@ class ConfirmTokenService extends Component
         
         return ConfirmToken::find()
             ->byType(ConfirmTokenType::SMS)
+            ->byAction(ConfirmTokenAction::UNIVERSAL)
             ->byUserId($user_id)
             ->notExpiried()
             ->one();
     }
     
-    public function validateSmsToken($phone, $code)
+    public function validatePhone($phone)
     {
         $user = \Teimur\YiiPhoneConfirm\entities\User::byPhone($phone);
-        
+    
         if(empty($user))
             throw new HttpException(400, Yii::t('app', 'Try to sign up'));
-        
+    
         $token = $this->findUserSmsToken($user->id);
-        
+    
         $try_count = 10;
-        
+    
         if (empty($token))
-            throw new HttpException(400, Yii::t('app', 'Try to resend sms'));
-        
+            return null;
+    
         if ($token->try_count > $try_count)
             throw new HttpException(400, Yii::t('app', 'Too many try. Try tomorrow.'));
         
+        $this->attemptCheck($token);
+        
+        return $token;
+    }
+    
+    public function validateSmsToken($phone, $code = null)
+    {
+        $user = \Teimur\YiiPhoneConfirm\entities\User::byPhone($phone);
+    
+        if(empty($user))
+            throw new HttpException(400, Yii::t('app', 'Try to sign up'));
+    
+        $token = $this->findUserSmsToken($user->id);
+    
+        $try_count = 10;
+    
+        if (empty($token))
+            throw new HttpException(400, Yii::t('app', 'Try to resend sms'));
+    
+        if ($token->try_count > $try_count)
+            throw new HttpException(400, Yii::t('app', 'Too many try. Try tomorrow.'));
+    
         if ($token->token != $code) {
             $token->updateCounters(['try_count' => 1]);
             throw new HttpException(
@@ -155,7 +179,7 @@ class ConfirmTokenService extends Component
             );
         }
         
-        return $token->token;
+        return $token;
     }
     
     public function deleteToken($phone, $code)

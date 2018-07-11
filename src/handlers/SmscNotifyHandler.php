@@ -72,10 +72,9 @@ class SmscNotifyHandler implements HandlerInterface
     {
         /** @var SmsNotification $notification */
 //        $result = $this->send_sms($notification->getRecipientNumber(), $notification->getMessage(), 0, 0, 0, 0, false);
-//
 //        return sizeof($result) === 4;
-        $logger = Yii::$app->monolog->getLogger();
-        $logger->info(Yii::t('app', 'Sms send to {number}', ['number' => $notification->getRecipientNumber()]));
+
+        Yii::info(Yii::t('app', 'Sms send to {number}', ['number' => $notification->getRecipientNumber()]));
         
         return true;
     }
