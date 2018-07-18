@@ -132,6 +132,18 @@ class ConfirmTokenService extends Component
             ->one();
     }
     
+    public function findUserEmailToken($user_id)
+    {
+        $this->deleteOldToken();
+        
+        return ConfirmToken::find()
+            ->byType(ConfirmTokenType::EMAIL)
+            ->byAction(ConfirmTokenAction::UNIVERSAL)
+            ->byUserId($user_id)
+            ->notExpiried()
+            ->one();
+    }
+    
     public function validatePhone($phone)
     {
         $user = \Teimur\YiiPhoneConfirm\entities\User::byPhone($phone);
@@ -180,6 +192,69 @@ class ConfirmTokenService extends Component
         }
         
         return $token;
+    }
+    
+    public function validateEmailToken($user_id, $code)
+    {
+        $user = \Teimur\YiiPhoneConfirm\entities\User::find()
+            ->where(['id' => $user_id])
+            ->one();
+        
+    
+        if(empty($user))
+            throw new HttpException(400, Yii::t('app', 'Try to sign up'));
+    
+        $token = $this->findUserEmailToken($user->id);
+        
+        $try_count = 10;
+    
+        if (empty($token))
+            throw new HttpException(400, Yii::t('app', 'Try to resend email'));
+    
+        if ($token->try_count > $try_count)
+            throw new HttpException(400, Yii::t('app', 'Too many try. Try tomorrow.'));
+    
+        if ($token->token != $code) {
+            $token->updateCounters(['try_count' => 1]);
+            throw new HttpException(
+                400,
+                Yii::t('app', 'Incorrect code. Try again. There are still {count} attempts ', ['count' => $try_count - $token->try_count])
+            );
+        }
+    
+        return $token;
+        
+    }
+    
+    public function validateSmsTokenByUserId($user_id, $code)
+    {
+        $user = \Teimur\YiiPhoneConfirm\entities\User::find()
+            ->where(['id' => $user_id])
+            ->one();
+    
+        if(empty($user))
+            throw new HttpException(400, Yii::t('app', 'Try to sign up'));
+    
+        $token = $this->findUserSmsToken($user->id);
+        
+        $try_count = 10;
+    
+        if (empty($token))
+            throw new HttpException(400, Yii::t('app', 'Try to resend sms'));
+    
+        if ($token->try_count > $try_count)
+            throw new HttpException(400, Yii::t('app', 'Too many try. Try tomorrow.'));
+    
+        if ($token->token != $code) {
+            $token->updateCounters(['try_count' => 1]);
+            throw new HttpException(
+                400,
+                Yii::t('app', 'Incorrect code. Try again. There are still {count} attempts ', ['count' => $try_count - $token->try_count])
+            );
+        }
+    
+        return $token;
+        
     }
     
     public function deleteToken($phone, $code)
