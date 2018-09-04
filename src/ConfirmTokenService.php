@@ -166,6 +166,28 @@ class ConfirmTokenService extends Component
         return $token;
     }
     
+    public function validateEmail($email)
+    {
+        $user = \Teimur\YiiPhoneConfirm\entities\User::byEmail($email);
+        
+        if(empty($user))
+            throw new HttpException(400, Yii::t('app', 'Try to sign up'));
+        
+        $token = $this->findUserSmsToken($user->id);
+        
+        $try_count = 10;
+        
+        if (empty($token))
+            return null;
+        
+        if ($token->try_count > $try_count)
+            throw new HttpException(400, Yii::t('app', 'Too many try. Try tomorrow.'));
+        
+        $this->attemptCheck($token);
+        
+        return $token;
+    }
+    
     public function validateSmsToken($phone, $code = null)
     {
         $user = \Teimur\YiiPhoneConfirm\entities\User::byPhone($phone);
@@ -194,13 +216,12 @@ class ConfirmTokenService extends Component
         return $token;
     }
     
-    public function validateEmailToken($user_id, $code)
+    public function validateEmailToken($email, $code)
     {
         $user = \Teimur\YiiPhoneConfirm\entities\User::find()
-            ->where(['id' => $user_id])
+            ->where(['email' => $email])
             ->one();
         
-    
         if(empty($user))
             throw new HttpException(400, Yii::t('app', 'Try to sign up'));
     

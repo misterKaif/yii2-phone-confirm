@@ -22,4 +22,11 @@ class User
             'phone' => $phone
         ])->limit(1)->one();
     }
+    
+    public static function byEmail($email)
+    {
+        return self::find()->where([
+            'email' => $email
+        ])->limit(1)->one();
+    }
 }

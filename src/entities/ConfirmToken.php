@@ -103,4 +103,14 @@ class ConfirmToken extends ActiveRecord
             ->limit(1)
             ->one();
     }
+    
+    public static function findEmailUniversalByUser($user_id)
+    {
+        return self::find()
+            ->byAction(ConfirmTokenAction::UNIVERSAL)
+            ->byType(ConfirmTokenType::EMAIL)
+            ->byUserId($user_id)
+            ->limit(1)
+            ->one();
+    }
 }
